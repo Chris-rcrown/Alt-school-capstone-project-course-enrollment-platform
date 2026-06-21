@@ -105,6 +105,8 @@ flowchart LR
 - Unique constraint: `(user_id, course_id)`
 
 ```mermaid
+
+![Entity Relationship Diagram](image-1.png)
 erDiagram
 		USERS ||--o{ ENROLLMENTS : has
 		COURSES ||--o{ ENROLLMENTS : has
@@ -188,7 +190,18 @@ DATABASE_URL=postgresql+psycopg2://username:password@host:5432/dbname
 pip install -r requirements.txt
 ```
 
-4. Create `.env` and set secure values.
+4. Copy `.env.example` to `.env`, then set secure values.
+
+```bash
+copy .env.example .env
+```
+
+If you are using macOS/Linux:
+
+```bash
+cp .env.example .env
+```
+
 5. Run database migrations:
 
 ```bash
@@ -360,6 +373,7 @@ Testing strategy:
 The provided `Procfile` defines:
 - release phase: `alembic upgrade head`
 - web process: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+![API Docs](image.png)
 
 This supports platforms that honor Procfile-based deployment workflows.
 
