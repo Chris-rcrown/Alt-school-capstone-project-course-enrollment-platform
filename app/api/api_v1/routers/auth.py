@@ -27,6 +27,8 @@ register_rate_limiter = FixedWindowRateLimiter(
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(register_rate_limiter)],
     tags=["Auth", "Public"],
+    summary="Register a new user",
+    description="Create a new account as either a student or admin.",
 )
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
     return auth_service.register_user(db, user_in)
@@ -37,6 +39,8 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     response_model=Token,
     dependencies=[Depends(login_rate_limiter)],
     tags=["Auth", "Public"],
+    summary="Log in and get a token",
+    description="Authenticate with email and password to receive a JWT access token.",
 )
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth_service.authenticate_user(db, email=form_data.username, password=form_data.password)

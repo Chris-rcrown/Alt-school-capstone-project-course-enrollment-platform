@@ -10,7 +10,13 @@ from app.services import course as course_service
 router = APIRouter()
 
 
-@router.get("", response_model=list[CourseRead], tags=["Public"])
+@router.get(
+    "",
+    response_model=list[CourseRead],
+    tags=["Public"],
+    summary="List available courses",
+    description="Return active courses with optional pagination and filters.",
+)
 def list_active_courses(
     db: Session = Depends(get_db),
     skip: Annotated[int, Query(ge=0)] = 0,
@@ -31,22 +37,49 @@ def list_active_courses(
     )
 
 
-@router.get("/{course_id}", response_model=CourseRead, tags=["Public"])
+@router.get(
+    "/{course_id}",
+    response_model=CourseRead,
+    tags=["Public"],
+    summary="Get a course by ID",
+    description="Return a single active course by its identifier.",
+)
 def read_course(course_id: int, db: Session = Depends(get_db)):
     course = course_service.get_course_by_id(db, course_id)
     return course
 
 
-@router.post("", response_model=CourseRead, dependencies=[Depends(require_admin)], tags=["Admin"])
+@router.post(
+    "",
+    response_model=CourseRead,
+    dependencies=[Depends(require_admin)],
+    tags=["Admin"],
+    summary="Create a course",
+    description="Create a new course record. Admin only.",
+)
 def create_course(course_in: CourseCreate, db: Session = Depends(get_db)):
     return course_service.create_course(db, course_in)
 
 
-@router.put("/{course_id}", response_model=CourseRead, dependencies=[Depends(require_admin)], tags=["Admin"])
+@router.put(
+    "/{course_id}",
+    response_model=CourseRead,
+    dependencies=[Depends(require_admin)],
+    tags=["Admin"],
+    summary="Update a course",
+    description="Update course fields such as title, code, capacity, or active status. Admin only.",
+)
 def update_course(course_id: int, course_in: CourseUpdate, db: Session = Depends(get_db)):
     return course_service.update_course(db, course_id, course_in)
 
 
-@router.delete("/{course_id}", response_model=CourseRead, dependencies=[Depends(require_admin)], tags=["Admin"])
+@router.delete(
+    "/{course_id}",
+    response_model=CourseRead,
+    dependencies=[Depends(require_admin)],
+    tags=["Admin"],
+    summary="Soft delete a course",
+    description="Mark a course as inactive and hidden from public reads. Admin only.",
+)
 def delete_course(course_id: int, db: Session = Depends(get_db)):
     return course_service.soft_delete_course(db, course_id)
