@@ -106,7 +106,7 @@ flowchart LR
 
 ```mermaid
 
-![Entity Relationship Diagram](image-1.png)
+![ERD](image2.png)
 erDiagram
 		USERS ||--o{ ENROLLMENTS : has
 		COURSES ||--o{ ENROLLMENTS : has
