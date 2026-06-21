@@ -107,6 +107,7 @@ flowchart LR
 ```mermaid
 
 ![ERD](image2.png)
+
 erDiagram
 		USERS ||--o{ ENROLLMENTS : has
 		COURSES ||--o{ ENROLLMENTS : has
