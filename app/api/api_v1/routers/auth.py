@@ -3,19 +3,30 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
+from app.core.config import settings
+from app.core.rate_limit import FixedWindowRateLimiter
 from app.schemas.user import UserCreate, UserRead
 from app.schemas.token import Token
 from app.services import auth as auth_service
 
 router = APIRouter()
 
+login_rate_limiter = FixedWindowRateLimiter(
+    max_requests=settings.AUTH_LOGIN_RATE_LIMIT,
+    window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+)
+register_rate_limiter = FixedWindowRateLimiter(
+    max_requests=settings.AUTH_REGISTER_RATE_LIMIT,
+    window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+)
 
-@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+
+@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(register_rate_limiter)])
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
     return auth_service.register_user(db, user_in)
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=Token, dependencies=[Depends(login_rate_limiter)])
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth_service.authenticate_user(db, email=form_data.username, password=form_data.password)
     if not user:

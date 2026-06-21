@@ -59,3 +59,36 @@ def test_student_cannot_create_course(client):
     )
     assert create_response.status_code == 403
     assert create_response.json()["detail"] == "Admin credentials required"
+
+
+def test_course_pagination_filtering_and_soft_delete(client):
+    admin_payload = {"name": "Admin P", "email": "admin-p@example.com", "password": "adminpass123", "role": "admin"}
+    client.post("/api/v1/auth/register", json=admin_payload)
+    login_response = client.post(
+        "/api/v1/auth/login",
+        data={"username": admin_payload["email"], "password": admin_payload["password"]},
+    )
+    token = login_response.json()["access_token"]
+
+    for idx, code in enumerate(["CS201", "CS202", "MTH101"], start=1):
+        create_response = client.post(
+            "/api/v1/courses",
+            json={"title": f"Course {idx}", "code": code, "capacity": idx + 1},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert create_response.status_code == 200
+
+    filtered = client.get("/api/v1/courses?code=CS&skip=0&limit=1")
+    assert filtered.status_code == 200
+    assert len(filtered.json()) == 1
+    assert filtered.json()[0]["code"].startswith("CS")
+
+    first_course = client.get("/api/v1/courses?limit=1").json()[0]
+    delete_response = client.delete(
+        f"/api/v1/courses/{first_course['id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert delete_response.status_code == 200
+
+    detail_after_delete = client.get(f"/api/v1/courses/{first_course['id']}")
+    assert detail_after_delete.status_code == 404

@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     DATABASE_URL: str = "sqlite:///./app.db"
+    AUTH_RATE_LIMIT_WINDOW_SECONDS: int = 60
+    AUTH_LOGIN_RATE_LIMIT: int = 30
+    AUTH_REGISTER_RATE_LIMIT: int = 20
 
     model_config = {
         "env_file": ".env",

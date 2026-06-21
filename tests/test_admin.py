@@ -48,3 +48,18 @@ def test_admin_can_view_and_remove_enrollments(client):
     )
     assert removed.status_code == 200
     assert removed.json()["user_id"] == student_enroll.json()["user_id"]
+
+    audit_logs = client.get(
+        "/api/v1/enrollments/audit-logs?limit=10",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert audit_logs.status_code == 200
+    actions = [entry["action"] for entry in audit_logs.json()]
+    assert "enrolled" in actions
+    assert "removed_by_admin" in actions
+
+    filtered_enrollments = client.get(
+        f"/api/v1/enrollments?course_id={course_id}&limit=5",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert filtered_enrollments.status_code == 200

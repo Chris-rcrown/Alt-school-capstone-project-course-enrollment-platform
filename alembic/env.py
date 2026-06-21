@@ -17,6 +17,7 @@ from app.db.base import Base
 import app.models.user  # noqa: F401
 import app.models.course  # noqa: F401
 import app.models.enrollment  # noqa: F401
+import app.models.enrollment_audit_log  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

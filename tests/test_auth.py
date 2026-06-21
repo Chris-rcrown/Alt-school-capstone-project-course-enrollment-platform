@@ -1,6 +1,3 @@
-from app.schemas.user import UserCreate
-
-
 def test_register_and_login_user(client):
     payload = {"name": "Test Student", "email": "student@example.com", "password": "password123", "role": "student"}
     response = client.post("/api/v1/auth/register", json=payload)
@@ -32,3 +29,26 @@ def test_get_profile_requires_token(client):
     )
     assert profile_response.status_code == 200
     assert profile_response.json()["email"] == auth_data["username"]
+
+
+def test_login_rate_limit(client):
+    payload = {
+        "name": "Rate Limit Student",
+        "email": "rate-limit@example.com",
+        "password": "password123",
+        "role": "student",
+    }
+    register_response = client.post("/api/v1/auth/register", json=payload)
+    assert register_response.status_code == 201
+
+    status_codes = []
+    for _ in range(40):
+        response = client.post(
+            "/api/v1/auth/login",
+            data={"username": payload["email"], "password": payload["password"]},
+        )
+        status_codes.append(response.status_code)
+        if response.status_code == 429:
+            break
+
+    assert 429 in status_codes
