@@ -21,12 +21,23 @@ register_rate_limiter = FixedWindowRateLimiter(
 )
 
 
-@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(register_rate_limiter)])
+@router.post(
+    "/register",
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(register_rate_limiter)],
+    tags=["Auth", "Public"],
+)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
     return auth_service.register_user(db, user_in)
 
 
-@router.post("/login", response_model=Token, dependencies=[Depends(login_rate_limiter)])
+@router.post(
+    "/login",
+    response_model=Token,
+    dependencies=[Depends(login_rate_limiter)],
+    tags=["Auth", "Public"],
+)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth_service.authenticate_user(db, email=form_data.username, password=form_data.password)
     if not user:

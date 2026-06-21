@@ -5,7 +5,16 @@ from app.core.config import settings
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title=settings.PROJECT_NAME)
+    app = FastAPI(
+        title=settings.PROJECT_NAME,
+        openapi_tags=[
+            {"name": "Public", "description": "Open endpoints available without a role restriction."},
+            {"name": "Auth", "description": "Authentication and account endpoints."},
+            {"name": "General", "description": "Authenticated endpoints available to both admins and students."},
+            {"name": "Student", "description": "Endpoints reserved for authenticated students."},
+            {"name": "Admin", "description": "Endpoints reserved for administrators."},
+        ],
+    )
     app.include_router(api_router, prefix="/api/v1")
     app.add_middleware(
         CORSMiddleware,

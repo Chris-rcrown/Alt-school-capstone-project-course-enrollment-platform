@@ -7,6 +7,6 @@ from app.schemas.user import UserRead
 router = APIRouter()
 
 
-@router.get("/me", response_model=UserRead)
+@router.get("/me", response_model=UserRead, tags=["General"])
 def read_current_user(current_user=Depends(get_current_active_user)):
     return current_user

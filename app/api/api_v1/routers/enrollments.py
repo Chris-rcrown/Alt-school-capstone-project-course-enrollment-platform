@@ -12,17 +12,17 @@ from app.services import enrollment as enrollment_service
 router = APIRouter()
 
 
-@router.post("/{course_id}", response_model=EnrollmentRead, dependencies=[Depends(require_student)])
+@router.post("/{course_id}", response_model=EnrollmentRead, dependencies=[Depends(require_student)], tags=["Student"])
 def enroll_in_course(course_id: int, current_user=Depends(get_current_active_user), db: Session = Depends(get_db)):
     return enrollment_service.enroll_student(db, current_user, course_id)
 
 
-@router.delete("/{course_id}", response_model=EnrollmentRead, dependencies=[Depends(require_student)])
+@router.delete("/{course_id}", response_model=EnrollmentRead, dependencies=[Depends(require_student)], tags=["Student"])
 def deregister_from_course(course_id: int, current_user=Depends(get_current_active_user), db: Session = Depends(get_db)):
     return enrollment_service.deregister_student(db, current_user, course_id)
 
 
-@router.get("", response_model=list[EnrollmentRead], dependencies=[Depends(require_admin)])
+@router.get("", response_model=list[EnrollmentRead], dependencies=[Depends(require_admin)], tags=["Admin"])
 def read_enrollments(
     db: Session = Depends(get_db),
     skip: Annotated[int, Query(ge=0)] = 0,
@@ -43,7 +43,7 @@ def read_enrollments(
     )
 
 
-@router.get("/course/{course_id}", response_model=list[EnrollmentRead], dependencies=[Depends(require_admin)])
+@router.get("/course/{course_id}", response_model=list[EnrollmentRead], dependencies=[Depends(require_admin)], tags=["Admin"])
 def read_course_enrollments(
     course_id: int,
     db: Session = Depends(get_db),
@@ -64,7 +64,7 @@ def read_course_enrollments(
     )
 
 
-@router.delete("/{course_id}/users/{user_id}", response_model=EnrollmentRead, dependencies=[Depends(require_admin)])
+@router.delete("/{course_id}/users/{user_id}", response_model=EnrollmentRead, dependencies=[Depends(require_admin)], tags=["Admin"])
 def remove_student_from_course(
     course_id: int,
     user_id: int,
@@ -74,7 +74,7 @@ def remove_student_from_course(
     return enrollment_service.remove_student_from_course(db, course_id, user_id, actor_user_id=current_user.id)
 
 
-@router.get("/audit-logs", response_model=list[EnrollmentAuditLogRead], dependencies=[Depends(require_admin)])
+@router.get("/audit-logs", response_model=list[EnrollmentAuditLogRead], dependencies=[Depends(require_admin)], tags=["Admin"])
 def read_enrollment_audit_logs(
     db: Session = Depends(get_db),
     skip: Annotated[int, Query(ge=0)] = 0,

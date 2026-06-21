@@ -10,7 +10,7 @@ from app.services import course as course_service
 router = APIRouter()
 
 
-@router.get("", response_model=list[CourseRead])
+@router.get("", response_model=list[CourseRead], tags=["Public"])
 def list_active_courses(
     db: Session = Depends(get_db),
     skip: Annotated[int, Query(ge=0)] = 0,
@@ -31,22 +31,22 @@ def list_active_courses(
     )
 
 
-@router.get("/{course_id}", response_model=CourseRead)
+@router.get("/{course_id}", response_model=CourseRead, tags=["Public"])
 def read_course(course_id: int, db: Session = Depends(get_db)):
     course = course_service.get_course_by_id(db, course_id)
     return course
 
 
-@router.post("", response_model=CourseRead, dependencies=[Depends(require_admin)])
+@router.post("", response_model=CourseRead, dependencies=[Depends(require_admin)], tags=["Admin"])
 def create_course(course_in: CourseCreate, db: Session = Depends(get_db)):
     return course_service.create_course(db, course_in)
 
 
-@router.put("/{course_id}", response_model=CourseRead, dependencies=[Depends(require_admin)])
+@router.put("/{course_id}", response_model=CourseRead, dependencies=[Depends(require_admin)], tags=["Admin"])
 def update_course(course_id: int, course_in: CourseUpdate, db: Session = Depends(get_db)):
     return course_service.update_course(db, course_id, course_in)
 
 
-@router.delete("/{course_id}", response_model=CourseRead, dependencies=[Depends(require_admin)])
+@router.delete("/{course_id}", response_model=CourseRead, dependencies=[Depends(require_admin)], tags=["Admin"])
 def delete_course(course_id: int, db: Session = Depends(get_db)):
     return course_service.soft_delete_course(db, course_id)
